@@ -1,0 +1,55 @@
+run:
+  name: olmo3_1b_baseline
+  seed: 1337
+  save_folder: /home/ly/lowgpu_train/hearth-OLMo/outputs/olmo3_1b_baseline
+  work_dir: /home/ly/lowgpu_train/hearth-OLMo/outputs/work
+  save_overwrite: true
+  metrics_collect_interval: 5
+
+model:
+  size: olmo3_1B
+  param_dtype: bfloat16
+  attn_backend: sdpa
+
+data:
+  sequence_length: 1024
+  num_workers: 2
+  # Replace these with real pre-tokenized OLMo/Dolma .npy files.
+  train_paths:
+    - /home/ly/lowgpu_train/hearth-OLMo/data/train.npy
+  eval_paths:
+    - /home/ly/lowgpu_train/hearth-OLMo/data/eval.npy
+  synthetic:
+    enabled: false
+
+train:
+  max_steps: 1000
+  global_batch_tokens: 16384
+  rank_microbatch_tokens: 1024
+  z_loss_multiplier: 1.0e-5
+
+optim:
+  lr: 3.0e-4
+  weight_decay: 0.1
+  betas: [0.9, 0.95]
+  eps: 1.0e-8
+  warmup_steps: 100
+  max_grad_norm: 1.0
+
+parallel:
+  fsdp: true
+  reduce_dtype: float32
+  activation_checkpointing: full
+  compile_model: false
+  prefetch_factor: 0
+
+eval:
+  enabled: true
+  interval: 250
+  steps: 25
+  label: validation
+
+checkpoint:
+  save_interval: 500
+  ephemeral_save_interval:
+  save_async: false

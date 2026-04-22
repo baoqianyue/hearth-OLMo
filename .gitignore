@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Local environments
+.env
+.env.*
+.cache/
+
+# Large/generated experiment artifacts
+data/*
+!data/.gitkeep
+outputs/*
+!outputs/.gitkeep
+reports/*
+!reports/.gitkeep
+
+# Model/checkpoint/data files, including any that land outside the standard
+# generated directories.
+*.distcp
+*.npy
+*.parquet
+*.pt
+*.safetensors
+
+# Logs
+*.log
+wandb/
+
+# External source checkouts used for local evaluation development.
+src/ai2-olmes/
+src/olmes/
+
+# Editor/OS
+.DS_Store
+.idea/
+.vscode/

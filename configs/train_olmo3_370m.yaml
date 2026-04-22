@@ -1,0 +1,55 @@
+run:
+  name: olmo3_370m_smoke
+  seed: 1337
+  save_folder: /home/ly/lowgpu_train/hearth-OLMo/outputs/olmo3_370m_smoke_corecfg
+  work_dir: /home/ly/lowgpu_train/hearth-OLMo/outputs/work
+  save_overwrite: true
+  metrics_collect_interval: 1
+
+model:
+  size: olmo3_370M
+  param_dtype: bfloat16
+  attn_backend: sdpa
+
+data:
+  sequence_length: 512
+  num_workers: 0
+  synthetic:
+    enabled: true
+    output_dir: /home/ly/lowgpu_train/hearth-OLMo/data/smoke
+    num_train_tokens: 524288
+    num_eval_tokens: 65536
+    vocab_limit: 32000
+    seed: 17
+
+train:
+  max_steps: 20
+  global_batch_tokens: 2048
+  rank_microbatch_tokens: 512
+  z_loss_multiplier: 1.0e-5
+
+optim:
+  lr: 3.0e-4
+  weight_decay: 0.1
+  betas: [0.9, 0.95]
+  eps: 1.0e-8
+  warmup_steps: 5
+  max_grad_norm: 1.0
+
+parallel:
+  fsdp: true
+  reduce_dtype: float32
+  activation_checkpointing: full
+  compile_model: false
+  prefetch_factor: 0
+
+eval:
+  enabled: true
+  interval: 10
+  steps: 4
+  label: smoke_eval
+
+checkpoint:
+  save_interval: 20
+  ephemeral_save_interval:
+  save_async: false

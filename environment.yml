@@ -1,0 +1,19 @@
+name: olmo
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch
+  - nvidia
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+dependencies:
+  - python=3.10
+  - pytorch=2.6.0=gpu_cuda124_py310hf27f713_206
+  - pytorch-gpu=2.6.0
+  - pytorch-cuda=12.4
+  - pip
+  - pip:
+      - -i https://pypi.tuna.tsinghua.edu.cn/simple
+      - ai2-olmo-core[transformers]
+      - accelerate
+      - pyarrow
+      # OLMES is the official OLMo evaluation stack. Install it from GitHub:
+      # python -m pip install -e "git+https://github.com/allenai/olmes.git#egg=ai2-olmes"

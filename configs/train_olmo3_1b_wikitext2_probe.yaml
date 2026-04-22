@@ -1,0 +1,54 @@
+run:
+  name: olmo3_1b_wikitext2_probe
+  seed: 1337
+  save_folder: /home/ly/lowgpu_train/hearth-OLMo/outputs/olmo3_1b_wikitext2_probe
+  work_dir: /home/ly/lowgpu_train/hearth-OLMo/outputs/work
+  save_overwrite: true
+  metrics_collect_interval: 5
+
+model:
+  size: olmo3_1B
+  param_dtype: bfloat16
+  attn_backend: sdpa
+
+data:
+  sequence_length: 512
+  num_workers: 0
+  train_paths:
+    - /home/ly/lowgpu_train/hearth-OLMo/data/wikitext2_raw/train.npy
+  eval_paths:
+    - /home/ly/lowgpu_train/hearth-OLMo/data/wikitext2_raw/eval.npy
+  synthetic:
+    enabled: false
+
+train:
+  max_steps: 50
+  global_batch_tokens: 4096
+  rank_microbatch_tokens: 512
+  z_loss_multiplier: 1.0e-5
+
+optim:
+  lr: 2.5e-4
+  weight_decay: 0.1
+  betas: [0.9, 0.95]
+  eps: 1.0e-8
+  warmup_steps: 10
+  max_grad_norm: 1.0
+
+parallel:
+  fsdp: true
+  reduce_dtype: float32
+  activation_checkpointing: full
+  compile_model: false
+  prefetch_factor: 0
+
+eval:
+  enabled: true
+  interval: 25
+  steps: 4
+  label: wikitext2_val
+
+checkpoint:
+  save_interval: 50
+  ephemeral_save_interval:
+  save_async: false

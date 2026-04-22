@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hearth-olmo"
+version = "0.1.0"
+description = "Small-GPU OLMo3 training and evaluation harness built on OLMo-core."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+  "ai2-olmo-core[transformers]>=2.5.0",
+  "accelerate",
+  "numpy",
+  "pandas",
+  "pyarrow",
+  "pyyaml",
+  "requests",
+  "rich",
+  "safetensors",
+  "torch>=2.6.0",
+  "transformers",
+]
+
+[project.optional-dependencies]
+eval = [
+  "ai2-olmes @ git+https://github.com/allenai/olmes.git",
+]
+
+[project.urls]
+Homepage = "https://github.com/baoqianyue/hearth-OLMo"
+Repository = "https://github.com/baoqianyue/hearth-OLMo"
+
+[tool.setuptools]
+py-modules = []

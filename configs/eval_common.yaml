@@ -1,0 +1,15 @@
+hf_endpoint: https://hf-mirror.com
+sequence_length: 1024
+max_windows: 128
+dtype: bf16
+device_map: auto
+
+models:
+  official_7b: allenai/Olmo-3-1025-7B
+
+data:
+  eval_paths:
+    - /home/ly/lowgpu_train/hearth-OLMo/data/eval.npy
+
+outputs:
+  report_dir: /home/ly/lowgpu_train/hearth-OLMo/reports

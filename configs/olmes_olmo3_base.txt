@@ -1,0 +1,6 @@
+olmo3:base:stem_qa_mc
+olmo3:base:nonstem_qa_mc
+olmo3:base:gen
+olmo3:base:math
+olmo3:base:code
+olmo3:base:code_fim

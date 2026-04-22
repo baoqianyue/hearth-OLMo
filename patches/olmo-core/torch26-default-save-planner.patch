@@ -1,0 +1,40 @@
+diff --git a/src/olmo_core/distributed/checkpoint/__init__.py b/src/olmo_core/distributed/checkpoint/__init__.py
+--- a/src/olmo_core/distributed/checkpoint/__init__.py
++++ b/src/olmo_core/distributed/checkpoint/__init__.py
+@@
+ import logging
++import inspect
+ from concurrent.futures import Future
+@@
+ log = logging.getLogger(__name__)
+ 
+ 
++def _build_default_save_planner(enable_plan_caching: bool = False) -> DefaultSavePlanner:
++    kwargs: Dict[str, Any] = {"dedup_save_to_lowest_rank": True}
++    if "enable_plan_caching" in inspect.signature(DefaultSavePlanner).parameters:
++        kwargs["enable_plan_caching"] = enable_plan_caching
++    return DefaultSavePlanner(**kwargs)
++
++
+ @torch.no_grad()
+ def save_state_dict(
+@@
+-    planner = DefaultSavePlanner(
+-        dedup_save_to_lowest_rank=True, enable_plan_caching=enable_plan_caching
+-    )
++    planner = _build_default_save_planner(enable_plan_caching=enable_plan_caching)
+@@
+-    planner = DefaultSavePlanner(
+-        dedup_save_to_lowest_rank=True, enable_plan_caching=enable_plan_caching
+-    )
++    planner = _build_default_save_planner(enable_plan_caching=enable_plan_caching)
+@@
+-    planner = DefaultSavePlanner(
+-        dedup_save_to_lowest_rank=True, enable_plan_caching=enable_plan_caching
+-    )
++    planner = _build_default_save_planner(enable_plan_caching=enable_plan_caching)
+@@
+-    planner = DefaultSavePlanner(
+-        dedup_save_to_lowest_rank=True, enable_plan_caching=enable_plan_caching
+-    )
++    planner = _build_default_save_planner(enable_plan_caching=enable_plan_caching)
