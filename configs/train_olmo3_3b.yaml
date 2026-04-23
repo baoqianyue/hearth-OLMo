@@ -1,7 +1,7 @@
 run:
-  name: olmo3_3b_probe
+  name: olmo3_3b_dolma3_150b_pilot
   seed: 1337
-  save_folder: /home/ly/lowgpu_train/hearth-OLMo/outputs/olmo3_3b_probe
+  save_folder: /home/ly/lowgpu_train/hearth-OLMo/outputs/olmo3_3b_dolma3_150b_pilot
   work_dir: /home/ly/lowgpu_train/hearth-OLMo/outputs/work
   save_overwrite: true
   metrics_collect_interval: 5
@@ -12,13 +12,13 @@ model:
   attn_backend: sdpa
 
 data:
+  tokenizer: allenai/Olmo-3-1025-7B
   sequence_length: 1024
   num_workers: 2
-  # Replace these with real pre-tokenized OLMo/Dolma .npy files.
   train_paths:
-    - /home/ly/lowgpu_train/hearth-OLMo/data/train.npy
+    - /home/ly/lowgpu_train/hearth-OLMo/data/dolma3_150b_pilot/train.npy
   eval_paths:
-    - /home/ly/lowgpu_train/hearth-OLMo/data/eval.npy
+    - /home/ly/lowgpu_train/hearth-OLMo/data/dolma3_150b_pilot/eval.npy
   synthetic:
     enabled: false
 

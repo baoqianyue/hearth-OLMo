@@ -24,8 +24,10 @@ CONFIGS = {
     # 370M is kept as a legacy pipeline smoke target. The main reproduction
     # line focuses on 1B and 3B.
     "370m": REPO_ROOT / "configs" / "train_olmo3_370m_wikitext2.yaml",
-    "1b": REPO_ROOT / "configs" / "train_olmo3_1b_wikitext2_probe.yaml",
-    "3b": REPO_ROOT / "configs" / "train_olmo3_3b_wikitext2_probe.yaml",
+    "1b": REPO_ROOT / "configs" / "train_olmo3_1b.yaml",
+    "3b": REPO_ROOT / "configs" / "train_olmo3_3b.yaml",
+    "1b_probe": REPO_ROOT / "configs" / "train_olmo3_1b_wikitext2_probe.yaml",
+    "3b_probe": REPO_ROOT / "configs" / "train_olmo3_3b_wikitext2_probe.yaml",
 }
 
 OFFICIAL_BASELINES = {

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import requests
@@ -31,9 +32,24 @@ def download(url: str, output: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("url")
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("url", nargs="?", help="Single URL to download.")
+    parser.add_argument("--output", type=Path, help="Output path for a single URL.")
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        help="JSON manifest with entries containing url and output fields.",
+    )
     args = parser.parse_args()
+    if args.manifest:
+        manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+        entries = manifest["files"] if isinstance(manifest, dict) else manifest
+        for entry in entries:
+            output = Path(entry["output"])
+            download(entry["url"], output)
+            print(output)
+        return
+    if not args.url or not args.output:
+        raise SystemExit("Provide either URL + --output or --manifest.")
     download(args.url, args.output)
     print(args.output)
 

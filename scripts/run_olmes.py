@@ -45,6 +45,34 @@ def parse_model_args(raw: str | None) -> str | None:
     return json.dumps(parsed, ensure_ascii=False)
 
 
+def completed_aliases(paths: list[Path]) -> set[str]:
+    aliases: set[str] = set()
+    for root in paths:
+        files = sorted(root.glob("task-*-metrics.json")) if root.is_dir() else [root]
+        for path in files:
+            with path.open("r", encoding="utf-8") as f:
+                payload = json.load(f)
+            alias = payload.get("task_config", {}).get("metadata", {}).get("alias")
+            if alias:
+                aliases.add(alias)
+    return aliases
+
+
+def expand_task_aliases(tasks: list[str], local_olmes: Path) -> list[str]:
+    if local_olmes.exists():
+        sys.path.insert(0, str(local_olmes))
+    try:
+        from oe_eval.launch import resolve_task_suite
+    except Exception:
+        return tasks
+
+    expanded: list[str] = []
+    task_suite_parent: dict[str, str] = {}
+    for task in tasks:
+        expanded.extend(resolve_task_suite(task, task_suite_parent))
+    return expanded
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", default=None, help="HF model id or local HF model directory")
@@ -76,6 +104,13 @@ def main() -> None:
         type=Path,
         default=None,
         help="Set HF_DATASETS_CACHE for OLMES dataset downloads.",
+    )
+    parser.add_argument(
+        "--skip-completed-from",
+        type=Path,
+        nargs="*",
+        default=None,
+        help="Read existing OLMES metrics dirs/files and skip tasks whose metadata.alias is already present.",
     )
     parser.add_argument("--extra-arg", action="append", default=[], help="Extra raw argument forwarded to OLMES.")
     args = parser.parse_args()
@@ -114,6 +149,14 @@ def main() -> None:
         raise SystemExit("--model is required unless --list-tasks or --list-task-suites is used.")
 
     tasks = args.task if args.task else OLMO3_SUITES[args.suite]
+    if args.skip_completed_from:
+        done = completed_aliases(args.skip_completed_from)
+        expanded = expand_task_aliases(list(tasks), local_olmes)
+        tasks = [task for task in expanded if task not in done]
+        print(f"Skipping {len(done)} completed task aliases; launching {len(tasks)} remaining tasks.")
+        if not tasks:
+            print("No remaining tasks.")
+            return
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     cmd.extend(["--model", args.model, "--task", *tasks, "--output-dir", str(args.output_dir)])

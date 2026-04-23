@@ -15,10 +15,13 @@ venv/
 # Large/generated experiment artifacts
 data/*
 !data/.gitkeep
+!data/manifests/
+!data/manifests/*.json
 outputs/*
 !outputs/.gitkeep
 reports/*
 !reports/.gitkeep
+!reports/mainline_1b_3b_status.md
 
 # Model/checkpoint/data files, including any that land outside the standard
 # generated directories.

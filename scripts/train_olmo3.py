@@ -108,6 +108,19 @@ def _attention_backend(name: str) -> AttentionBackendName:
     }[name.lower()]
 
 
+def _tokenizer_config(identifier: str) -> TokenizerConfig:
+    name = identifier.lower()
+    if name in {"dolma2", "allenai/dolma2-tokenizer"}:
+        return TokenizerConfig.dolma2()
+    if name in {"dolma2_sigdig", "allenai/dolma2-tokenizer-sigdig"}:
+        return TokenizerConfig.dolma2_sigdig()
+    if name in {"gpt_neox_olmo_dolma_v1_5", "allenai/gpt-neox-olmo-dolma-v1_5"}:
+        return TokenizerConfig.gpt_neox_olmo_dolma_v1_5()
+    if name == "gpt2":
+        return TokenizerConfig.gpt2()
+    return TokenizerConfig.from_hf(identifier)
+
+
 def _maybe_generate_smoke_data(cfg: dict[str, Any], tokenizer: TokenizerConfig) -> tuple[list[str], list[str]]:
     synthetic = cfg.get("synthetic", {})
     if not synthetic.get("enabled", False):
@@ -152,7 +165,7 @@ def build_components(raw: dict[str, Any]):
     eval_cfg = raw.get("eval", {})
     ckpt_cfg = raw.get("checkpoint", {})
 
-    tokenizer = TokenizerConfig.dolma2()
+    tokenizer = _tokenizer_config(str(data_cfg.get("tokenizer", "allenai/dolma2-tokenizer")))
     factory_name = MODEL_FACTORIES.get(str(model_cfg.get("size", "370M")), str(model_cfg.get("size", "370M")))
     try:
         factory = getattr(TransformerConfig, factory_name)

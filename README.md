@@ -117,14 +117,43 @@ conda run -n olmo python -m torch.distributed.run --nproc_per_node=2 \
   --config configs/train_olmo3_370m_wikitext2.yaml
 ```
 
-For larger `1B` and `3B` runs, replace the placeholder paths in:
+For larger `1B` and `3B` runs, use the official Dolma 3 150B sample mix as the
+first practical pilot corpus. This dataset keeps the same broad source mix
+strategy as Dolma 3 while being much smaller than the full 6T-token mix.
+
+Prepare a local token-id pilot corpus:
+
+```bash
+HF_ENDPOINT=https://hf-mirror.com \
+conda run -n olmo python scripts/prepare_text_data.py \
+  --preset dolma3_150b_pilot \
+  --output-dir data/dolma3_150b_pilot \
+  --tokenizer allenai/Olmo-3-1025-7B \
+  --max-train-tokens 1000000000 \
+  --max-eval-tokens 8388608
+```
+
+This preset reads Dolma 3 JSONL shards directly from Hugging Face, parses only
+the `text` field, tokenizes with the OLMo3 tokenizer, and writes flat token-id
+binary files. It records the selected source shards in
+`data/dolma3_150b_pilot/manifest.json`. By default it excludes paths containing
+`adult_content` and samples files round-robin across source directories.
+
+The mainline configs point at these generated files:
 
 - `configs/train_olmo3_1b.yaml`
 - `configs/train_olmo3_3b.yaml`
 
-with pre-tokenized OLMo/Dolma token files. The expected format is a flat raw
-binary array of token IDs produced with the matching tokenizer, not a NumPy
-`.npy` file with a header.
+The single-source OLMo data manifest is retained only for low-cost format smoke
+tests:
+
+```bash
+conda run -n olmo python scripts/download_files.py \
+  --manifest data/manifests/olmo3_dolma_smoke.json
+```
+
+Training files are flat raw binary arrays of token IDs produced with the
+matching tokenizer, not NumPy `.npy` files with headers.
 
 Official OLMo data examples are hosted under `https://olmo-data.org/`; if direct
 download is slow, mirror the files manually into `data/` and point the configs at
@@ -278,17 +307,19 @@ Current verified outputs:
 - 1B converted HF: `outputs/hf/olmo3_1b_wikitext2_probe_step50`
 - 3B Wikitext2 probe: `outputs/olmo3_3b_wikitext2_probe/step20`
 - 3B converted HF: `outputs/hf/olmo3_3b_wikitext2_probe_step20`
+- 1B OLMES base_easy limit=8 table:
+  `reports/olmes/1b_olmo3_1b_wikitext2_probe_step50_base_easy_l8_combined.md`
 - PPL table: `reports/olmo3_ladder_ppl.md`
 - OLMES smoke tables under `reports/olmes/`
 
 ## Recommended Order
 
-1. Run the `1B` probe end to end on GPU0/1.
-2. Run the `3B` probe end to end on GPU0/1 with conservative batch tokens.
-3. Evaluate both probes with the same OLMES smoke task.
-4. Move from smoke to `base_easy` for 1B and 3B.
-5. Evaluate official `allenai/Olmo-3-1025-7B` with the same OLMES task set.
-6. Replace Wikitext2 with larger pre-tokenized OLMo/Dolma shards and repeat.
+1. Generate `data/dolma3_150b_pilot/train.npy` and `eval.npy`.
+2. Run the `1B` mainline config on GPU0/1.
+3. Convert the checkpoint and run PPL plus OLMES smoke.
+4. Run the `3B` mainline config after the 1B path is stable.
+5. Use `base_easy` selectively for checkpoints worth comparing.
+6. Evaluate official `allenai/Olmo-3-1025-7B` after local 1B/3B runs stabilize.
 
 ## Reproduction Runner
 
@@ -297,7 +328,7 @@ OLMES eval, and result collection commands consistent across `1b` and `3b`.
 The script prints commands by default; add `--execute` to run them. `370m`
 remains available as a legacy option for debugging.
 
-Run the 1B Wikitext2 probe end to end:
+Run the 1B mainline workflow:
 
 ```bash
 conda run -n olmo python scripts/run_reproduction.py \
@@ -307,7 +338,7 @@ conda run -n olmo python scripts/run_reproduction.py \
   --execute
 ```
 
-Run the 3B Wikitext2 probe with conservative defaults:
+Run the 3B mainline workflow with conservative defaults:
 
 ```bash
 conda run -n olmo python scripts/run_reproduction.py \
@@ -315,6 +346,16 @@ conda run -n olmo python scripts/run_reproduction.py \
   --skip-conversion-validation \
   --olmes smoke \
   --execute
+```
+
+The completed Wikitext2 probe configs remain available as `1b_probe` and
+`3b_probe`:
+
+```bash
+conda run -n olmo python scripts/run_reproduction.py \
+  --model-size 1b_probe \
+  --skip-conversion-validation \
+  --olmes smoke
 ```
 
 Plan the official 7B baseline against the same eval workflow:

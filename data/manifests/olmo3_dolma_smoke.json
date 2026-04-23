@@ -1,0 +1,16 @@
+{
+  "name": "olmo3_dolma_smoke",
+  "purpose": "single-source format smoke test only",
+  "files": [
+    {
+      "split": "train",
+      "url": "https://olmo-data.org/preprocessed/dolma3-0625/v0.1-official/allenai/dolma3-tokenizer/olmocr_science_pdfs/science_math_and_technology/000000.npy",
+      "output": "data/olmo3_dolma_smoke/train/000000.npy"
+    },
+    {
+      "split": "eval",
+      "url": "https://olmo-data.org/preprocessed/dolma3-0625/v0.1-official/allenai/dolma3-tokenizer/olmocr_science_pdfs/science_math_and_technology/000001.npy",
+      "output": "data/olmo3_dolma_smoke/eval/000001.npy"
+    }
+  ]
+}
