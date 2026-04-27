@@ -12,7 +12,7 @@ model:
   attn_backend: sdpa
 
 data:
-  tokenizer: allenai/Olmo-3-1025-7B
+  tokenizer: /home/ly/lowgpu_train/hearth-OLMo/data/tokenizers/olmo3_1025_7b
   sequence_length: 1024
   num_workers: 2
   train_paths:

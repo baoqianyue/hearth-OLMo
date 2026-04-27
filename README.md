@@ -139,6 +139,15 @@ binary files. It records the selected source shards in
 `data/dolma3_150b_pilot/manifest.json`. By default it excludes paths containing
 `adult_content` and samples files round-robin across source directories.
 
+For unreliable networks, use the resumable wrapper. It consumes the pinned shard
+list in `data/manifests/dolma3_150b_pilot_files.json`, writes per-split state
+files under `data/dolma3_150b_pilot/`, and retries failed attempts:
+
+```bash
+tmux new-session -d -s dolma3_pilot \
+  'cd /home/ly/lowgpu_train/hearth-OLMo && bash scripts/run_prepare_dolma3_150b_pilot.sh'
+```
+
 The mainline configs point at these generated files:
 
 - `configs/train_olmo3_1b.yaml`

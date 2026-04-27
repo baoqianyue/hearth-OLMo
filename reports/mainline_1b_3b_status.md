@@ -41,7 +41,10 @@ Combined mean primary score: `2.63009`.
    `data/dolma3_150b_pilot/train.npy` and
    `data/dolma3_150b_pilot/eval.npy`. Use the `dolma3_150b_pilot` preset in
    `scripts/prepare_text_data.py`; it reads only the `text` field and records
-   the selected shards in `data/dolma3_150b_pilot/manifest.json`.
+   the selected shards in `data/dolma3_150b_pilot/manifest.json`. For unstable
+   network runs, use `scripts/run_prepare_dolma3_150b_pilot.sh`; it uses the
+   pinned shard list in `data/manifests/dolma3_150b_pilot_files.json` and
+   writes resumable state files.
 2. Run the 1B mainline config:
    `configs/train_olmo3_1b.yaml`.
 3. Increase 1B/3B training budgets with the same runner and collect comparable
