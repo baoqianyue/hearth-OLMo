@@ -9,6 +9,7 @@ for a 4x4090 workstation.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -109,6 +110,22 @@ def _attention_backend(name: str) -> AttentionBackendName:
 
 
 def _tokenizer_config(identifier: str) -> TokenizerConfig:
+    path = Path(identifier).expanduser()
+    if path.exists():
+        config_path = path / "config.json"
+        if not config_path.exists():
+            config_path = path / "tokenizer_config.json"
+        if not config_path.exists():
+            raise FileNotFoundError(f"No config.json or tokenizer_config.json found under {path}")
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        return TokenizerConfig(
+            vocab_size=config["vocab_size"],
+            eos_token_id=config["eos_token_id"],
+            pad_token_id=config.get("pad_token_id", config["eos_token_id"]),
+            bos_token_id=config.get("bos_token_id"),
+            identifier=str(path.resolve()),
+        )
+
     name = identifier.lower()
     if name in {"dolma2", "allenai/dolma2-tokenizer"}:
         return TokenizerConfig.dolma2()
